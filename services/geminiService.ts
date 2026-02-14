@@ -11,16 +11,16 @@ Analiz kuralları:
 3. Cevapların HER ZAMAN geçerli bir JSON ARRAY (liste) formatında olmalıdır.`;
 
 export const analyzeDispute = async (dispute: string, files: FileData[]): Promise<LegalVerdict[]> => {
-  // process.env.API_KEY artık vite.config sayesinde dolu gelecek
-  const apiKey = process.env.API_KEY;
+  // Vite tarafından enjekte edilen key'i al
+  const apiKey = (process.env as any).API_KEY;
 
-  if (!apiKey) {
-    throw new Error("API Anahtarı bulunamadı. Lütfen Vercel Settings > Environment Variables kısmından API_KEY eklediğinizden emin olun.");
+  if (!apiKey || apiKey === "") {
+    throw new Error("Sistem yapılandırması eksik: API_KEY bulunamadı. Lütfen Vercel ayarlarından anahtarı ekleyin.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
   
-  const promptText = `Lütfen ekteki belgeleri ve metni incele. Belgedeki TÜM maddeleri, soruları ve hukuki problemleri tek tek tespit et ve her biri için ayrı detaylı analiz yap: ${dispute || ''}`;
+  const promptText = `Aşağıdaki uyuşmazlığı ve ekteki belgeleri Türk hukuk mevzuatı çerçevesinde analiz et: ${dispute || 'Belge analizi isteniyor.'}`;
   
   const parts: any[] = [{ text: promptText }];
 
@@ -70,11 +70,11 @@ export const analyzeDispute = async (dispute: string, files: FileData[]): Promis
     });
 
     const text = response.text;
-    if (!text) throw new Error("Yapay zeka boş yanıt döndürdü.");
+    if (!text) throw new Error("Yapay zeka analiz üretemedi.");
     
     return JSON.parse(text);
-  } catch (err) {
-    console.error("Hukuki Analiz Hatası:", err);
-    throw err;
+  } catch (err: any) {
+    console.error("Gemini Error:", err);
+    throw new Error(err.message || "Analiz sırasında bir teknik hata oluştu.");
   }
 };

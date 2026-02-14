@@ -6,8 +6,8 @@ export default defineConfig({
     outDir: 'dist',
   },
   define: {
-    // Vercel ortamındaki API_KEY'i kodun içine enjekte eder
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
-    'process.env': {}
+    // Vercel'deki Environment Variable'ı doğrudan koda enjekte eder
+    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || ''),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }
 });
