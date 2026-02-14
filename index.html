@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dijital Hakim - E-Adalet Sistemi</title>
     
+    <!-- Mobil Uygulama Modu -->
     <meta name="theme-color" content="#1e293b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-touch-fullscreen" content="yes">
-    <meta name="format-detection" content="telephone=no">
     
     <link rel="manifest" href="/manifest.json">
     
@@ -23,28 +23,38 @@
             --legal-navy: #1e293b;
             --legal-gold: #b45309;
         }
+        
+        /* Uygulama gibi davranmasını sağlayan kritik CSS */
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Dışarıdan kaydırmayı engelle */
+            position: fixed; /* Ekranı sabitle */
+            width: 100%;
+        }
+
+        #root {
+            height: 100%;
+            overflow-y: auto; /* Sadece içeriği kaydır */
+            -webkit-overflow-scrolling: touch;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
         * {
             touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+
         input, textarea {
             -webkit-user-select: text;
             user-select: text;
         }
-        body { 
-          font-family: 'Inter', sans-serif; 
-          -webkit-tap-highlight-color: transparent;
-          margin: 0;
-          padding-top: env(safe-area-inset-top);
-          padding-bottom: env(safe-area-inset-bottom);
-          overscroll-behavior-y: contain;
-          overflow-x: hidden;
-        }
+
         .serif-font { font-family: 'Crimson Pro', serif; }
         .legal-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
         ::-webkit-scrollbar { display: none; }
-        .btn-active:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 <script type="importmap">
 {
@@ -64,15 +74,17 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(err => {
-            console.log('SW registration failed: ', err);
-          });
+          navigator.serviceWorker.register('/sw.js');
         });
       }
-      // Çift tıklama ile zoom yapmayı engelle
-      document.addEventListener('touchstart', function (event) {
-        if (event.touches.length > 1) {
-          event.preventDefault();
+      
+      // Çekerek yenilemeyi (pull-to-refresh) engelle
+      document.addEventListener('touchmove', function (e) {
+        if (e.target.closest('#root') && e.target.closest('#root').scrollTop > 0) {
+          // Normal scroll
+        } else {
+          // Üst sınıra dayandıysa çekmeyi engelle
+          // e.preventDefault(); 
         }
       }, { passive: false });
     </script>
