@@ -1,0 +1,9 @@
+
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.dijital_hakim1.twa",
+    "sha256_cert_fingerprints": ["4B:3F:13:70:E7:FB:D6:04:4B:1A:0B:31:49:54:56:81:8D:5A:2A:E3:B2:B6:0F:DC:DF:3C:F0:37:EF:01:A6:5C"]
+  }
+}]
