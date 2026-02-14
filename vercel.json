@@ -34,7 +34,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!.well-known|sw.js|manifest.json).*)",
+      "source": "/((?!.well-known/|sw.js|manifest.json|privacy-policy.html).*)",
       "destination": "/index.html"
     }
   ]

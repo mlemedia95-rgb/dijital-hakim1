@@ -357,6 +357,7 @@ const App: React.FC = () => {
             <p className="italic">
                 Analizler yapay zeka tarafından üretilmiştir, kesin hukuki bağlayıcılığı yoktur.
             </p>
+            <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Gizlilik Politikası</a>
         </div>
       </footer>
 
