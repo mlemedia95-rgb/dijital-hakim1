@@ -72,9 +72,19 @@
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
+      // Service Worker Kaydı - Hata ayıklama ve köken (origin) kontrolü ile
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+          // Göreceli yol kullanımı (./sw.js) sandbox ortamlarında daha güvenlidir.
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .then(reg => {
+              console.log('Service Worker başarıyla kaydedildi. Kapsam:', reg.scope);
+            })
+            .catch(err => {
+              // ai.studio gibi sandbox ortamlarında origin mismatch (köken uyuşmazlığı) normaldir.
+              // Bu durum uygulamanın çalışmasını engellemez.
+              console.warn('Service Worker kaydı şu anki ortamda atlandı:', err.message);
+            });
         });
       }
       
@@ -84,9 +94,8 @@
           // Normal scroll
         } else {
           // Üst sınıra dayandıysa çekmeyi engelle
-          // e.preventDefault(); 
         }
-      }, { passive: false });
+      }, { passive: true });
     </script>
 </body>
 </html>
