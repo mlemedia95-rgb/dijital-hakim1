@@ -1,10 +1,9 @@
 
-const CACHE_NAME = 'dijital-hakim-v4';
+const CACHE_NAME = 'dijital-hakim-v5'; // Cache versiyonu artırıldı
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/privacy-policy.html',
   'https://cdn-icons-png.flaticon.com/512/3062/3062599.png'
 ];
 

@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { analyzeDispute } from './services/geminiService';
 import { LegalVerdict, AppStatus, FileData } from './types';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const App: React.FC = () => {
   const [dispute, setDispute] = useState('');
@@ -11,6 +12,7 @@ const App: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileData[]>([]);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -349,6 +351,9 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Gizlilik Politikası Modalı */}
+      {showPrivacy && <PrivacyPolicy onClose={() => setShowPrivacy(false)} />}
+
       <footer className="py-16 bg-slate-950 text-slate-600 text-[9px] text-center px-10">
         <div className="max-w-xs mx-auto space-y-4 opacity-40">
             <p className="leading-relaxed uppercase tracking-[0.2em]">
@@ -357,7 +362,7 @@ const App: React.FC = () => {
             <p className="italic">
                 Analizler yapay zeka tarafından üretilmiştir, kesin hukuki bağlayıcılığı yoktur.
             </p>
-            <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Gizlilik Politikası</a>
+            <button onClick={() => setShowPrivacy(true)} className="underline hover:text-white transition-colors">Gizlilik Politikası</button>
         </div>
       </footer>
 
