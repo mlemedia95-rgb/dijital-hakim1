@@ -64,7 +64,7 @@ const App: React.FC = () => {
       setStatus('RESULT');
     } catch (err: any) {
       console.error("Analysis Error:", err);
-      setError("Analiz sırasında bir hata oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.");
+      setError(err.message || "Analiz sırasında bir hata oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.");
       setStatus('ERROR');
     }
   };

@@ -11,7 +11,6 @@ Analiz kuralları:
 3. Cevapların HER ZAMAN geçerli bir JSON ARRAY (liste) formatında olmalıdır.`;
 
 export const analyzeDispute = async (dispute: string, files: FileData[]): Promise<LegalVerdict[]> => {
-  // Vite tarafından enjekte edilen key'i al
   const apiKey = (process.env as any).API_KEY;
 
   if (!apiKey || apiKey === "") {
@@ -75,6 +74,22 @@ export const analyzeDispute = async (dispute: string, files: FileData[]): Promis
     return JSON.parse(text);
   } catch (err: any) {
     console.error("Gemini Error:", err);
-    throw new Error(err.message || "Analiz sırasında bir teknik hata oluştu.");
+
+    let userFriendlyMessage = "Analiz sırasında beklenmedik bir teknik hata oluştu. Lütfen daha sonra tekrar deneyin.";
+
+    if (err.message) {
+      const lowerCaseError = err.message.toLowerCase();
+      if (lowerCaseError.includes('quota') || lowerCaseError.includes('429')) {
+        userFriendlyMessage = "API kullanım limitinize ulaştınız. Lütfen Google Cloud konsolundan limitlerinizi kontrol edin veya bir süre bekleyip tekrar deneyin.";
+      } else if (lowerCaseError.includes('billing')) {
+        userFriendlyMessage = "API anahtarınızla ilişkili projede faturalandırma etkinleştirilmemiş. Lütfen Google Cloud projenizin faturalandırma durumunu kontrol edin.";
+      } else if (lowerCaseError.includes('api key not valid') || lowerCaseError.includes('permission denied')) {
+        userFriendlyMessage = "Sağlanan API anahtarı geçersiz veya gerekli yetkilere sahip değil. Lütfen Vercel ayarlarınızı kontrol edin.";
+      } else if (lowerCaseError.includes('candidate was blocked')) {
+        userFriendlyMessage = "Yapay zeka, güvenlik politikaları nedeniyle bir yanıt üretemedi. Lütfen talebinizi farklı bir şekilde ifade etmeyi deneyin.";
+      }
+    }
+    
+    throw new Error(userFriendlyMessage);
   }
 };
