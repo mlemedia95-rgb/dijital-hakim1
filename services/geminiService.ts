@@ -2,7 +2,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { LegalVerdict, FileData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// API_KEY'in vercel üzerinden geldiğinden emin oluyoruz
+const getApiKey = () => {
+  return process.env.API_KEY || "";
+};
 
 const SYSTEM_INSTRUCTION = `Sen son derece profesyonel, tarafsız ve uzman bir 'Dijital Hakim'sin. 
 Görevin, kullanıcı tarafından sunulan metni ve BELGELERİ (Resim/PDF) satır satır inceleyerek içerisindeki TÜM farklı hukuki uyuşmazlıkları, soruları, talepleri veya maddeleri tek tek tespit etmektir.
@@ -21,6 +24,9 @@ Analiz kuralları:
 Önemli: Cevapların HER ZAMAN geçerli bir JSON ARRAY (liste) formatında olmalıdır.`;
 
 export const analyzeDispute = async (dispute: string, files: FileData[]): Promise<LegalVerdict[]> => {
+  const apiKey = getApiKey();
+  const ai = new GoogleGenAI({ apiKey });
+  
   const promptText = `Lütfen ekteki belgeleri ve metni incele. Belgedeki TÜM maddeleri, soruları ve hukuki problemleri tek tek tespit et ve her biri için ayrı detaylı analiz yap: ${dispute || ''}`;
   
   const parts: any[] = [{ text: promptText }];
@@ -72,10 +78,8 @@ export const analyzeDispute = async (dispute: string, files: FileData[]): Promis
 
     let text = response.text;
     if (!text) throw new Error("Modelden yanıt alınamadı.");
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
     const parsed = JSON.parse(text);
-    // Tek nesne dönerse listeye çevir, liste dönerse aynen ver
     return Array.isArray(parsed) ? parsed : [parsed];
   } catch (err) {
     console.error("Gemini Multi-Analysis Error:", err);

@@ -5,7 +5,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  server: {
-    port: 3000,
+  // Bu kısım process.env.API_KEY hatasını çözer
+  define: {
+    'process.env': {}
   }
 });
