@@ -10,6 +10,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
     <link rel="manifest" href="/manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,12 +23,23 @@
             --legal-navy: #1e293b;
             --legal-gold: #b45309;
         }
+        * {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input, textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
         body { 
           font-family: 'Inter', sans-serif; 
           -webkit-tap-highlight-color: transparent;
           margin: 0;
           padding-top: env(safe-area-inset-top);
           padding-bottom: env(safe-area-inset-bottom);
+          overscroll-behavior-y: contain;
+          overflow-x: hidden;
         }
         .serif-font { font-family: 'Crimson Pro', serif; }
         .legal-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
@@ -55,6 +69,12 @@
           });
         });
       }
+      // Çift tıklama ile zoom yapmayı engelle
+      document.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, { passive: false });
     </script>
 </body>
 </html>
