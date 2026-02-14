@@ -2,29 +2,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { LegalVerdict, FileData } from "../types";
 
-// API_KEY'in vercel üzerinden geldiğinden emin oluyoruz
-const getApiKey = () => {
-  return process.env.API_KEY || "";
-};
-
 const SYSTEM_INSTRUCTION = `Sen son derece profesyonel, tarafsız ve uzman bir 'Dijital Hakim'sin. 
 Görevin, kullanıcı tarafından sunulan metni ve BELGELERİ (Resim/PDF) satır satır inceleyerek içerisindeki TÜM farklı hukuki uyuşmazlıkları, soruları, talepleri veya maddeleri tek tek tespit etmektir.
 
 Analiz kuralları:
 1. Belgede birden fazla soru veya konu varsa, her birini AYRI birer analiz nesnesi olarak oluştur.
-2. Hiçbir soruyu atlama. Eğer belgede 10 farklı madde/soru varsa, yanıtın 10 nesnelik bir liste olmalı.
-3. Her nesne şu yapıda olmalı:
-   - vakaOzeti: O maddeye özel kısa özet.
-   - hukukiNiteleme: Maddenin hukuki alanı.
-   - ilgiliMaddeler: Kanun dayanakları.
-   - gerekce: Hukuki sebep.
-   - basitAciklama: Vatandaşın anlayacağı sade özet.
-   - hukum: O spesifik soruya dair nihai karar/öneri.
-
-Önemli: Cevapların HER ZAMAN geçerli bir JSON ARRAY (liste) formatında olmalıdır.`;
+2. Hiçbir soruyu atlama.
+3. Cevapların HER ZAMAN geçerli bir JSON ARRAY (liste) formatında olmalıdır.`;
 
 export const analyzeDispute = async (dispute: string, files: FileData[]): Promise<LegalVerdict[]> => {
-  const apiKey = getApiKey();
+  // process.env.API_KEY artık vite.config sayesinde dolu gelecek
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("API Anahtarı bulunamadı. Lütfen Vercel Settings > Environment Variables kısmından API_KEY eklediğinizden emin olun.");
+  }
+
   const ai = new GoogleGenAI({ apiKey });
   
   const promptText = `Lütfen ekteki belgeleri ve metni incele. Belgedeki TÜM maddeleri, soruları ve hukuki problemleri tek tek tespit et ve her biri için ayrı detaylı analiz yap: ${dispute || ''}`;
@@ -76,13 +69,12 @@ export const analyzeDispute = async (dispute: string, files: FileData[]): Promis
       }
     });
 
-    let text = response.text;
-    if (!text) throw new Error("Modelden yanıt alınamadı.");
+    const text = response.text;
+    if (!text) throw new Error("Yapay zeka boş yanıt döndürdü.");
     
-    const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [parsed];
+    return JSON.parse(text);
   } catch (err) {
-    console.error("Gemini Multi-Analysis Error:", err);
+    console.error("Hukuki Analiz Hatası:", err);
     throw err;
   }
 };
